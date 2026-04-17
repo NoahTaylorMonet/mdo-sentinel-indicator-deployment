@@ -36,7 +36,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 **[UPDATED - BEST PRACTICE] Option 1: Sentinel STIX Objects Upload API (Recommended)**
 - Build a Logic App or custom app that reads your indicator source and uploads STIX 2.0/2.1 objects to Sentinel Upload API
-- Endpoint: https://api.ti.sentinel.azure.com/workspaces/{workspaceId}/threat-intelligence-stix-objects:upload?api-version=2024-02-01-preview
+- Endpoint: https://api.ti.sentinel.azure.com/workspaces/{workspaceId}/threat-intelligence-stix-objects:upload?aapi-version=2024-02-01-preview
 - Authentication: Microsoft Entra app with **Microsoft Sentinel Contributor** role at the workspace scope and token audience https://management.azure.com/.default
 - Request body fields: sourcesystem, stixobjects
 - Throttling limits: 100 objects/request and 100 requests/minute
@@ -55,7 +55,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 ### Ingestion Checklist
 
 - [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
-- [ ] Upload API endpoint configured (pi-version=2024-02-01-preview)
+- [ ] Upload API endpoint configured (api-version=2024-02-01-preview)
 - [ ] Ingestion payload mapped to STIX 2.0/2.1 (sourcesystem + stixobjects)
 - [ ] Ingestion frequency defined (hourly / 4x daily)
 - [ ] Logic App, TAXII connector, or custom connector built and tested
