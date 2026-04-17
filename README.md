@@ -55,7 +55,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 ### Ingestion Checklist
 
 - [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
-- [ ] Upload API endpoint configured (api-version=2024-02-01-preview)
+- [ ] **[UPDATED]** Upload API endpoint configured (api-version=2024-02-01-preview)
 - [ ] Ingestion payload mapped to STIX 2.0/2.1 (sourcesystem + stixobjects)
 - [ ] Ingestion frequency defined (hourly / 4x daily)
 - [ ] Logic App, TAXII connector, or custom connector built and tested
