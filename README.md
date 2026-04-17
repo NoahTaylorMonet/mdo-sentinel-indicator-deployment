@@ -34,21 +34,31 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 ### Implementation Options
 
-**Option 1: Graph API Direct**
-- Build Logic App that reads your indicator source, transforms to Sentinel schema, calls Log Analytics API
-- Maintenance: Ongoing monitoring for API failures
+**Option 1: Sentinel STIX Objects Upload API (Recommended)**
+- Build a Logic App or custom app that reads your indicator source and uploads STIX 2.0/2.1 objects to Sentinel Upload API
+- Endpoint: https://api.ti.sentinel.azure.com/workspaces/{workspaceId}/threat-intelligence-stix-objects:upload?api-version=2024-02-01-preview
+- Authentication: Microsoft Entra app with **Microsoft Sentinel Contributor** role at the workspace scope and token audience https://management.azure.com/.default
+- Request body fields: sourcesystem, stixobjects
+- Throttling limits: 100 objects/request and 100 requests/minute
 
-**Option 2: Custom Data Connector**
-- Build custom connector using Azure Functions + App Service
+**Option 2: Threat Intelligence - TAXII Connector**
+- Use Sentinel's TAXII 2.x connector when your feed is already exposed via STIX/TAXII server collections
+- Maintenance: Lower if provider has stable TAXII implementation
+
+**Option 3: Custom Data Connector**
+- Build custom connector using Azure Functions + App Service for non-STIX/TAXII sources
 - Maintenance: Higher (custom code, versioning, updates)
+
+> **[UPDATED - BEST PRACTICE]** For TI ingestion into Sentinel, use the Upload API (STIX Objects API). Legacy TI ingestion paths based on older TI connector patterns are on deprecation path.
 
 ### Ingestion Checklist
 
-- [ ] Service Principal created with Log Analytics Contributor role
-- [ ] Ingestion into TI tables
+- [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
+- [ ] Upload API endpoint configured (pi-version=2024-02-01-preview)
+- [ ] Ingestion payload mapped to STIX 2.0/2.1 (sourcesystem + stixobjects)
 - [ ] Ingestion frequency defined (hourly / 4x daily)
-- [ ] Logic App or custom connector built and tested
-- [ ] Error handling and retry logic implemented
+- [ ] Logic App, TAXII connector, or custom connector built and tested
+- [ ] Throttling and retry logic implemented (respect 100 objects/request, 100 requests/min)
 
 </details>
 
@@ -187,7 +197,7 @@ Start with a constrained pilot that proves end-to-end lifecycle behavior for a s
 
 ### What This Looks Like in Action
 
-In practice, Sentinel does not promote every observed indicator. A Sentinel analytic rule identifies a candidate, the workflow checks policy and TABL capacity, and only then sends the approved indicator to MDO through Microsoft Graph.
+In practice, Sentinel does not promote every observed indicator. A Sentinel analytic rule identifies a candidate, the workflow checks policy and TABL capacity, and only then sends the approved indicator to MDO for enforcement. (TI ingestion into Sentinel should use STIX Objects Upload API.)
 
 Typical promotion flow:
 
@@ -293,11 +303,11 @@ CustomIndicator_CL
 <details>
 
 ### Foundation & Infrastructure
-- Service Principals: Ingestion (Log Analytics), Promotion (Graph API), Expiration
+- Service Principals / Entra apps: Ingestion (Sentinel Upload API with workspace-scoped Sentinel Contributor), Promotion (MDO enforcement API path), Expiration
 
 ### Data Ingestion
 - Logic App: Internal indicator source ingestion
-- Logic Apps or API from custom threat feed 
+- Sentinel Upload API integration for STIX objects (Logic App/custom app/TIP using `stixobjects` payload)
 - Deduplication logic (identify duplicate indicators)
 
 ### Sentinel Analytics
@@ -350,7 +360,9 @@ Based on the project complexity, these three items will consume the majority of 
 
 ## 9. Resources
 
-- **Graph API TI Indicators:** https://learn.microsoft.com/en-us/graph/api/resources/tiindicator
+- **Sentinel STIX Objects Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/stix-objects-api
+- **Connect TI platform with Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/connect-threat-intelligence-upload-api
+- **Threat intelligence in Sentinel (connectors and deprecation guidance):** https://learn.microsoft.com/en-us/azure/sentinel/understand-threat-intelligence
 - **TABL Management:** https://learn.microsoft.com/en-us/defender-office-365/tenant-allow-block-list-manage
 
 ---
