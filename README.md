@@ -34,12 +34,8 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 ### Implementation Options
 
-**[UPDATED - BEST PRACTICE] Option 1: Sentinel STIX Objects Upload API (Recommended)**
+**Option 1: Sentinel STIX Objects Upload API (Recommended)**
 - Build a Logic App or custom app that reads your indicator source and uploads STIX 2.0/2.1 objects to Sentinel Upload API
-- Endpoint: https://api.ti.sentinel.azure.com/workspaces/{workspaceId}/threat-intelligence-stix-objects:upload?api-version=2024-02-01-preview
-- Authentication: Microsoft Entra app with **Microsoft Sentinel Contributor** role at the workspace scope and token audience https://management.azure.com/.default
-- Request body fields: sourcesystem, stixobjects
-- Throttling limits: 100 objects/request and 100 requests/minute
 
 **Option 2: Threat Intelligence - TAXII Connector**
 - Use Sentinel's TAXII 2.x connector when your feed is already exposed via STIX/TAXII server collections
@@ -49,13 +45,9 @@ Organizations that handle large indicator volumes need both analytics depth and 
 - Build custom connector using Azure Functions + App Service for non-STIX/TAXII sources
 - Maintenance: Higher (custom code, versioning, updates)
 
-> **[UPDATED - BEST PRACTICE]** For TI ingestion into Sentinel, use the Upload API (STIX Objects API). Legacy TI ingestion paths based on older TI connector patterns are on deprecation path.
-
-> **[UPDATED - BEST PRACTICE]** The Sentinel TI Upload API is currently in preview. Validate production readiness and legal/compliance requirements against Azure Preview terms before broad rollout.
 ### Ingestion Checklist
 
-- [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
-- [ ] **[UPDATED]** Upload API endpoint configured (api-version=2024-02-01-preview)
+- [ ] Microsoft Entra app registration created and granted permissions on the target workspace
 - [ ] Ingestion payload mapped to STIX 2.0/2.1 (sourcesystem + stixobjects)
 - [ ] Ingestion frequency defined (hourly / 4x daily)
 - [ ] Logic App, TAXII connector, or custom connector built and tested
@@ -76,7 +68,7 @@ Once indicators are ingested, Sentinel analytic rules handle correlation. Out-of
 
 ---
 
-## 3. **[UPDATED]** Promotion to TABL via Automation
+## 3. Promotion to TABL via Automation
 
 <details>
 <summary><strong>Moving Indicators from Sentinel to MDO Enforcement</strong></summary>
@@ -324,7 +316,7 @@ CustomIndicator_CL
 
 Based on the project complexity, these three items will consume the majority of implementation effort:
 
-1. **[UPDATED] Promotion/Demotion Automation and Error Handling** (~120-160 hours)
+1. **Promotion/Demotion Automation and Error Handling**
 
 **What's involved:**
 - Logic App design: Trigger -> query -> validate -> capacity check -> dedup check -> TABL automation call -> audit log
@@ -333,34 +325,16 @@ Based on the project complexity, these three items will consume the majority of 
 
 ---
 
-### 2. **Production Hardening, Monitoring, and 14-Day Validation Checkpoint** (~140–180 hours)
-
-**Why it's effort-intensive:**
-- Requires planning, deploying, and monitoring infrastructure changes in production with high availability requirements
-- Full rollout is staged (domains → URLs → hashes → spoofed senders) to minimize blast radius, but each stage requires monitoring & approval
-- Operational readiness is critical: dashboards, alerts, runbooks, SOC training must all work together
-- First 14 days post-production are intensive: daily engineering + SOC reviews, runaway promotion detection, exception handling validation
+### 2. **Production Hardening, Monitoring, and 14-Day Validation Checkpoint** 
 
 **What's involved:**
 - Production infrastructure setup: Service principal rotation, separate prod/non-prod identities, logging workspace isolation
 - Monitoring & alerting deployment: 5+ critical alerts, dashboards, KPI tracking
-- Phased rollout execution: Week 1 domains (15K capacity), Week 2 URLs (15K), Week 3 hashes (15K), Week 4 spoofed senders (1K)
 - 14-day validation checkpoint: Daily reviews, performance trending, false-positive rate tracking, capacity consumption review
-- SOC training & on-call rotation: Handoff materials, runbooks, escalation procedures
-
-**Mitigation:**
-- Start infrastructure prep in Week 13 (before pilot sign-off)
-- Plan phased rollout stages in Weeks 12–13; identify success criteria for each stage gate
-- Assign senior architect (0.2 FTE) + SOC lead (0.8 FTE) + on-call rotation starting Week 13
 
 ---
 
-### 3. **[UPDATED] Sentinel Analytic Rules Development & Tuning** (~150-200 hours)
-
-**Why it's effort-intensive:**
-- Requires deep KQL expertise and organization-specific telemetry mapping
-- Requires iterative tuning to reduce false positives and analyst fatigue
-- Requires validation across multiple indicator types and detection sources
+### 3. **Sentinel Analytic Rules Development & Tuning** 
 
 **What's involved:**
 - Build and tune custom analytic rules for domain, URL, hash, and spoofing scenarios
@@ -368,7 +342,7 @@ Based on the project complexity, these three items will consume the majority of 
 - Establish governance for periodic rule tuning based on SOC feedback
 
 ---
-## 9. **[UPDATED]** Resources
+## 9. Resources
 
 - **Sentinel STIX Objects Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/stix-objects-api
 - **Connect TI platform with Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/connect-threat-intelligence-upload-api
