@@ -51,6 +51,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 > **[UPDATED - BEST PRACTICE]** For TI ingestion into Sentinel, use the Upload API (STIX Objects API). Legacy TI ingestion paths based on older TI connector patterns are on deprecation path.
 
+> **Note:** The Sentinel TI Upload API is currently in preview. Validate production readiness and legal/compliance requirements against Azure Preview terms before broad rollout.
 ### Ingestion Checklist
 
 - [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
@@ -75,12 +76,12 @@ Once indicators are ingested, Sentinel analytic rules handle correlation. Out-of
 
 ---
 
-## 3. Promotion to TABL via Graph API
+## 3. Promotion to TABL via Automation
 
 <details>
 <summary><strong>Moving Indicators from Sentinel to MDO Enforcement</strong></summary>
 
-High-confidence indicators are promoted to TABL using Microsoft Graph API.      
+High-confidence indicators are promoted to TABL using approved MDO automation methods (for example, Defender portal workflows or Exchange Online PowerShell cmdlets).      
 
 ### TABL Capacity by Indicator Type
 
@@ -117,11 +118,11 @@ Start with a constrained pilot that proves end-to-end lifecycle behavior for a s
 
 1. **Create new automation for pilot**
    - Create dedicated analytics rules/playbooks (do not reuse production playbooks)
-   - Add explicit naming convention (for example: \POC-Indicator-*\)
+   - Add explicit naming convention (for example: `POC-Indicator-*`)
 
 2. **Define Data in Sentinel**
    - Required fields: indicator value, type, confidence, source, first seen, last seen, status
-   - Add lifecycle state field: \Observed\ -> \Promoted\ -> \Expired\
+   - Add lifecycle state field: `Observed` -> `Promoted` -> `Expired`
 
 3. **Implement promotion policy**
    - Example criteria: confidence >= your organization's configured threshold + active observation in last N days
@@ -197,7 +198,7 @@ Start with a constrained pilot that proves end-to-end lifecycle behavior for a s
 
 ### What This Looks Like in Action
 
-In practice, Sentinel does not promote every observed indicator. A Sentinel analytic rule identifies a candidate, the workflow checks policy and TABL capacity, and only then sends the approved indicator to MDO for enforcement. (TI ingestion into Sentinel should use STIX Objects Upload API.)
+In practice, Sentinel does not promote every observed indicator. A Sentinel analytic rule identifies a candidate, the workflow checks policy and TABL capacity, and only then sends the approved indicator to MDO for enforcement using approved TABL automation methods. (TI ingestion into Sentinel should use STIX Objects Upload API.)
 
 Typical promotion flow:
 
@@ -247,7 +248,7 @@ If indicator is re-detected after expiration (or dormancy):
 1. Query promotion candidates from Sentinel
 2. Evaluate criteria (RiskScore >= 75, Detections >= 2)
 3. Check TABL capacity (pause if > 95%)
-4. Call Graph API to add to TABL
+4. Call approved TABL automation interface to add to TABL (for example, Exchange Online PowerShell automation)
 5. Update Sentinel status "promoted"
 6. Log audit event
 
@@ -255,7 +256,7 @@ If indicator is re-detected after expiration (or dormancy):
 
 1. Query dormant indicators (no activity > TTL days)
 2. Check each against TABL to confirm still enforced
-3. For each dormant: remove via Graph API DELETE
+3. For each dormant: remove via approved TABL automation interface
 4. Update Sentinel status "expired"
 5. Audit logging for compliance
 6. Summary report email
@@ -291,7 +292,7 @@ CustomIndicator_CL
 ### Alerts
 
 - **TABL > 90% capacity:** Pause promotions; escalate to architecture team      
-- **Promotion failures > 5/hour:** Investigate Graph API access
+- **Promotion failures > 5/hour:** Investigate TABL automation access and permissions
 - **Zero detections 7 days post-promotion:** Review analytic rule quality
 
 </details>
