@@ -51,7 +51,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 > **[UPDATED - BEST PRACTICE]** For TI ingestion into Sentinel, use the Upload API (STIX Objects API). Legacy TI ingestion paths based on older TI connector patterns are on deprecation path.
 
-> **Note:** The Sentinel TI Upload API is currently in preview. Validate production readiness and legal/compliance requirements against Azure Preview terms before broad rollout.
+> **[UPDATED - BEST PRACTICE]** The Sentinel TI Upload API is currently in preview. Validate production readiness and legal/compliance requirements against Azure Preview terms before broad rollout.
 ### Ingestion Checklist
 
 - [ ] Microsoft Entra app registration created and granted **Microsoft Sentinel Contributor** on the target workspace
@@ -76,7 +76,7 @@ Once indicators are ingested, Sentinel analytic rules handle correlation. Out-of
 
 ---
 
-## 3. Promotion to TABL via Automation
+## 3. **[UPDATED]** Promotion to TABL via Automation
 
 <details>
 <summary><strong>Moving Indicators from Sentinel to MDO Enforcement</strong></summary>
