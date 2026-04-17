@@ -34,7 +34,7 @@ Organizations that handle large indicator volumes need both analytics depth and 
 
 ### Implementation Options
 
-**Option 1: Sentinel STIX Objects Upload API (Recommended)**
+**[UPDATED - BEST PRACTICE] Option 1: Sentinel STIX Objects Upload API (Recommended)**
 - Build a Logic App or custom app that reads your indicator source and uploads STIX 2.0/2.1 objects to Sentinel Upload API
 - Endpoint: https://api.ti.sentinel.azure.com/workspaces/{workspaceId}/threat-intelligence-stix-objects:upload?api-version=2024-02-01-preview
 - Authentication: Microsoft Entra app with **Microsoft Sentinel Contributor** role at the workspace scope and token audience https://management.azure.com/.default
@@ -318,21 +318,17 @@ CustomIndicator_CL
 - **Logic App: Promote-Indicator-to-TABL** (core promotion with capacity checks, dedup, throttle retry)
 - **Logic App: Expire-Stale-Indicators** (weekly scheduled demotion of dormant indicators)
 
-### Monitoring & Operations
-- 5 critical alerts (capacity breach, promotion failures, API auth issues, feed down, zero detections)
-- Action groups for SOC escalation (email, SMS, incident platform)
-
----
+### Monitoring & Operations`n- 5 critical alerts (capacity breach, promotion failures, API auth issues, feed down, zero detections)`n- Action groups for SOC escalation (email, SMS, incident platform)`n`n</details>`n`n---
 
 ## 8. Top Effort Items
 
 Based on the project complexity, these three items will consume the majority of implementation effort:
 
-1. **Promotion Logic App Development & Error Handling** 
+1. **[UPDATED] Promotion/Demotion Automation and Error Handling** (~120-160 hours)
 
 **What's involved:**
-- Logic App design: Trigger → query → validate → capacity check → dedup check → Graph API call → audit log
-- Error paths: Retry logic for 429/500 errors, separate handling for 403/permission issues, exception queue for manual review
+- Logic App design: Trigger -> query -> validate -> capacity check -> dedup check -> TABL automation call -> audit log
+- Error paths: Retry logic for transient failures, separate handling for permission issues, exception queue for manual review
 - TABL capacity modeling: Track occupancy by type, reserve headroom, implement promotion pause/resume
 
 ---
@@ -359,7 +355,20 @@ Based on the project complexity, these three items will consume the majority of 
 
 ---
 
-## 9. Resources
+### 3. **[UPDATED] Sentinel Analytic Rules Development & Tuning** (~150-200 hours)
+
+**Why it's effort-intensive:**
+- Requires deep KQL expertise and organization-specific telemetry mapping
+- Requires iterative tuning to reduce false positives and analyst fatigue
+- Requires validation across multiple indicator types and detection sources
+
+**What's involved:**
+- Build and tune custom analytic rules for domain, URL, hash, and spoofing scenarios
+- Validate rule quality with pilot telemetry and adjust thresholds
+- Establish governance for periodic rule tuning based on SOC feedback
+
+---
+## 9. **[UPDATED]** Resources
 
 - **Sentinel STIX Objects Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/stix-objects-api
 - **Connect TI platform with Upload API:** https://learn.microsoft.com/en-us/azure/sentinel/connect-threat-intelligence-upload-api
